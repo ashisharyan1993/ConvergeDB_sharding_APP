@@ -1,0 +1,24 @@
+  <% include include/header.ejs %>
+
+ 
+  <div style="display: flex;justify-content: center;margin:10px;" >
+    <form action="/shop">
+      <div style="display: flex;flex-wrap: nowrap;justify-content: space-between; margin:20px;"  >
+        <input type="text" name="searchText" class="form-control" width="200px" placeholder="Search products here"/>
+        <button style="margin-left: 10px;"type="submit" value="Submit" class="btn btn-primary">Search</button>
+      </div>
+
+    </form>
+   
+  </div>
+  <div class="container">
+    <h2>Products(<%= products.length %>)</h2>
+    <!-- <p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.</p> -->
+    <div class="row">
+    <% products.forEach(function(product){ %>
+      <div class="col-md-3">
+        <% include components/product/grid.ejs %>
+      </div>
+    <% }); %>
+    </div>
+  </div>

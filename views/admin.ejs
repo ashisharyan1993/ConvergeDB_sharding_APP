@@ -1,0 +1,459 @@
+<% include include/header.ejs %>
+
+  <body>
+    <div class="container">
+      <div class="row" style="margin-top: 20px; text-align: center;">
+        <select class="form-control form-control-sm col-lg-2" id="selectID">
+          <option value="1">JSON</option>
+          <option value="2">XML</option>
+        </select>
+        <button
+          type="button"
+          class="btn btn-outline-success"
+          style="margin-left: 20px;"
+          onclick="callView();"
+        >
+          Change View
+        </button>
+      </div>
+      <div style="margin-top: 20px; display: none;" id="xmlcontainer">
+      <h3>XML</h3>
+        <p>
+          Order details are stored as XML document in the converge database
+        </p>
+      <nav>
+  		<div class="nav nav-tabs" id="nav-tab" role="tablist">
+    		<a class="nav-item nav-link active" id="nav-fetch-tab" data-toggle="tab" href="#nav-fetch" role="tab" aria-controls="nav-fetch" aria-selected="true">Fetch</a>
+    		<a class="nav-item nav-link" id="nav-insert-tab" data-toggle="tab" href="#nav-insert" role="tab" aria-controls="nav-insert" aria-selected="false">Insert</a>
+    		<a class="nav-item nav-link" id="nav-update-tab" data-toggle="tab" href="#nav-update" role="tab" aria-controls="nav-update" aria-selected="false">Update</a>
+    		<a class="nav-item nav-link" id="nav-delete-tab" data-toggle="tab" href="#nav-delete" role="tab" aria-controls="nav-delete" aria-selected="false">Delete</a>
+  		</div>
+	 </nav>
+     <div class="tab-content" id="nav-tabContent" style="margin-top:20px;">
+  		<div class="tab-pane fade show active" id="nav-fetch" role="tabpanel" aria-labelledby="nav-fetch-tab">
+  			 <div class="row">
+        	<select id="selectXmlDocumentId">
+        	
+        	</select>
+        	<button class="btn-success primary" onclick="getXmlData()">Fetch</button>
+        	<button class="btn-danger" onclick="clearScreen()" style="margin-left:20px;">Clear</button>
+        </div>
+        <div class="row"
+          style="
+            height: 400px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            overflow-y:scroll;
+          "
+          id="xmlBodyContainer"
+          contentEditable="true">
+        
+        </div>
+        <div class="row">
+           <button class="btn-success" onclick="insertXmlData()">Insert</button>
+           <button class="btn-primary" onclick="updateXmlData()">Update</button>
+        </div>
+  		</div>
+  		<div class="tab-pane fade" id="nav-insert" role="tabpanel" aria-labelledby="nav-insert-tab">
+  			<form action="/xml/insert" method="post">
+			<div class="row">
+
+				<div class="col-md-6">
+
+					<div class="form-group">
+						<label for="name">Full name:</label> <input type="text"
+							class="form-control" id="name" name="name" required>
+					</div>
+					<div class="form-group">
+						<label for="email">Email:</label> <input type="email"
+							class="form-control" id="email" name="email" required>
+					</div>
+					<div class="form-group">
+						<label for="phone">Phone:</label> <input type="text"
+							class="form-control" id="phone" name="phone" required
+							onkeypress="return ensureNumberic(event)">
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div class="form-group">
+						<label for="address">Address:</label> <input type="text"
+							class="form-control" id="address" name="address" required>
+					</div>
+					<div class="form-group">
+						<label for="city">City:</label> <input type="text"
+							class="form-control" id="city" name="city" required>
+					</div>
+					<div class="form-group">
+						<label for="phone">Pincode:</label> <input type="text"
+							class="form-control" id="pincode" name="pincode" required
+							onkeypress="return validatePin(event)">
+					</div>
+
+				</div>
+
+			</div>
+			<div style="display: flex; justify-content: center; padding: 2em;">
+				<button type="button" class="btn btn-primary"
+					onclick="submitForm();">Submit</button>
+			</div>
+		</form>
+  		</div>
+  		<div class="tab-pane fade" id="nav-update" role="tabpanel" aria-labelledby="nav-update-tab">
+  			UPDATE
+  		</div>
+  		<div class="tab-pane fade" id="nav-delete" role="tabpanel" aria-labelledby="nav-delete-tab">
+  			DELETE
+  		</div>
+  		
+	</div>	
+       
+      </div>
+      <div style="margin-top: 20px;" id="jsoncontainer">
+        <h3>JSON</h3>
+        <p>
+          Product details are stored as JSON document in the converge database
+        </p>
+        <p>
+          To get a prduct detail, please provide us a valid product id.
+     	  Product (pid) is a numeric unique identifer for a product. Currently ranging from (1-500)
+        </p>
+        <div class="row">
+          <input
+            type="text"
+            id="idField"
+            onkeypress="return ensureNumberic(event)"
+          />
+          <button class="btn-success primary" onclick="getJsonById()">Go</button>
+        </div>
+        <div
+          class="row"
+          style="
+            height: 400px;
+            border: 1px solid black;
+            margin-top: 10px;
+            margin-bottom: 10px;
+          "
+          id="jsonBodyContainer"
+        contentEditable="true"></div>
+        <div class="row">
+          <button class="btn-primary" onclick="updateJsonById()">Update</button>
+           <button class="btn-danger" onclick="deleteJsonById()" style="margin-left:20px;">Delete</button>
+           <button class="btn-success" onclick="insertJson()" style="margin-left:20px;">Insert</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- script src="/resources/js/endPointChecker.js" type="text/javascript"></script-->
+    <script>
+    
+    var globalurl = "http://158.101.100.92:3003/";
+    //var globalProductId = null;
+    
+    $(document).ready(function(){
+  	  refreshDropDown();
+    });
+    
+    function refreshDropDown(){
+  	  var selectList  = document.getElementById("selectXmlDocumentId");
+  	  $("#selectXmlDocumentId").empty();
+  	  $.ajax({
+            method: "GET",
+            url: "http://localhost:7001/xml/ids",
+            success: function (data) {
+          	  console.log("ids");
+          	  console.log(data);
+          	 var optionString="";
+          	
+          	for(let i=0;i<data.length;i++){
+          		//optionString+="<option value=\'"+data[i]+"\'>"+data[i]+"</option>";
+          		var option = document.createElement("option");
+          	    option.value = data[i];
+          	    option.text = data[i];
+          	    selectList.appendChild(option);
+     
+          	}
+      
+            },
+            error: function (err) {
+              console.log("error occured from server");
+            }
+          });
+    }
+    
+    
+    function callView() {
+      var item = document.getElementById("selectID");
+      if (item.value == 1) {
+        $("#xmlcontainer").hide();
+        $("#jsoncontainer").show();
+      }
+      if (item.value == 2) {
+        $("#jsoncontainer").hide();
+        $("#xmlcontainer").show();
+      }
+    }
+
+    function ensureNumberic(e) {
+      let value = document.getElementById("idField").value;
+      if (value.length + 1 > 3) {
+        return false;
+      }
+      var keyValue = e.key;
+      if (keyValue.match(/[0-9]/g)) {
+        return true;
+      }
+      return false;
+    }
+
+    function getJsonById() {
+  	 let id = document.getElementById("idField");
+  	 if(!id.value.length >0){
+           console.log(id.value);
+  		 alert("Please enter a valid id");
+  		 return;
+  	 }
+      $.ajax({
+        method: "GET",
+        url: "http://158.101.100.92:3003/products/"+id.value,
+       
+        success: function (data) {
+      	 let item = document.querySelector("#jsonBodyContainer");
+           item.innerHTML = JSON.stringify(data);
+           console.log(data);
+        },
+        error: function (xhr,err) {
+      	  let item = document.querySelector("#jsonBodyContainer");
+            if(xhr.status == 200){
+            	
+           	 	item.innerHTML = "There exists no any data for given pid";
+            }else{
+            	item.innerHTML = err;
+            }
+            
+        }
+      });
+    }
+    
+    function updateJsonById(){
+  	  ///product/update
+  	  let item = document.querySelector("#jsonBodyContainer");
+  	  let obj;
+  	  try{
+  		  obj= JSON.parse(item.innerText);
+  		  
+  	  }catch(e){
+  		  alert("Not a proper json");
+  		  return;
+  	  }
+  	 
+  	  if(obj.pid<0){
+  		  alert("PID NOT VALID");
+  		  return;
+  	  }
+  	  let dataToSend = JSON.stringify(obj);
+  	  //console.log(obj);
+  	  $.ajax({
+            method: "POST",
+            url: "http://158.101.100.92:3003/updateProduct/"+obj.pid,
+            dataType:'text',
+            contentType: 'application/json',
+            data:JSON.stringify(obj),
+            success: function (data) {
+          	 let item = document.querySelector("#jsonBodyContainer");
+          	 item.innerHTML = data;
+            },
+            error: function (xhr,err) {
+          	  console.log("error occured from server");
+            }
+          });
+  
+    }
+    
+    function deleteJsonById(){
+  	  ///product/update
+  	  let item = document.querySelector("#jsonBodyContainer");
+  	  let obj = JSON.parse(item.innerText);
+  	  if(obj.pid<0){
+  		  alert("PID NOT VALID");
+  		  return;
+  	  }
+  	  let dataToSend = JSON.stringify(obj);
+  	  console.log(obj);
+  	  $.ajax({
+            method: "POST",
+            url: "http://158.101.100.92:3003/deleteProduct/"+obj.pid,
+            contentType: 'application/json',
+            dataType:'text',
+            data:JSON.stringify(obj),
+            success: function (data) {
+          	 let item = document.querySelector("#jsonBodyContainer");
+          	 item.innerHTML = "Product deleted successfully"
+            },
+            error: function (err) {
+              console.log("error occured from server");
+            }
+          });
+  
+    }
+    
+    
+    function insertJson(){
+  	  ///product/update
+  	  let item = document.querySelector("#jsonBodyContainer");
+  	  let obj;
+  	  try{
+  		  obj = JSON.parse(item.innerText);
+  	  }catch(e){
+  		  alert("Not a valid JSON");
+  		  
+  	  }
+  	  
+  	  if(obj.pid<0){
+  		  alert("PID NOT VALID");
+  		  return;
+  	  }
+  	  let dataToSend = JSON.stringify(obj);
+  	  console.log(obj);
+  	  $.ajax({
+            method: "POST",
+            url: "http://localhost:3001/addProduct",
+            contentType: 'application/json',
+            dataType:'text',
+            data:JSON.stringify(obj),
+            success: function (data) {
+          	 let item = document.querySelector("#jsonBodyContainer");
+          	 item.innerHTML = data;
+            },
+            error: function (err) {
+              console.log("error occured from server");
+            }
+          });
+  
+    }
+    
+    function getXmlData(){
+  	  var item =document.getElementById("selectXmlDocumentId");
+  	  $.ajax({
+            method: "GET",
+            url: "http://localhost:7001/xml/read/"+item.value,
+            dataType:'xml',
+            success: function (data) {
+          	 console.log(data);
+          	 let item = document.querySelector("#xmlBodyContainer");
+          	 let parsedData = new XMLSerializer().serializeToString(data);
+          	 item.innerText = parsedData;
+            },
+            error: function (err) {
+              console.log("error occured from server");
+            }
+          });
+    }
+    function updateXmlData(){
+    	var data = {query:"order.name",id:21,value:"testField"};
+    	$.ajax({
+      		method:"POST",
+      		url:"http://localhost:7001/xml/update",
+      		contentType: "application/json",
+      	    dataType: "text",
+      		data:JSON.stringify(data),
+      	  	success: function(data){
+      	  		let item = document.querySelector("#xmlBodyContainer");
+             	 	item.innerHTML = data;
+             	 	
+      	  	},
+      	  	error:function(err){
+      	  		console.log("error occured while inserting");
+      	  	}
+      	  	
+      	  });
+    	
+    }
+    
+    function insertXmlData(){
+  	  var t = document.getElementById("xmlBodyContainer");
+  	  let data = t.innerText.trim();
+  	  let parser = new DOMParser();
+  	  let xmldoc = parser.parseFromString(data,"text/xml");
+  	  
+  	  try{
+  		/*  console.log(xmldoc.documentElement.cloneNode(false));
+  		if(xmldoc.documentElement.cloneNode(false) !="<order></order>"){
+  			alert("Root element to be order");
+  			return;
+  		} */
+  		if(xmldoc.getElementsByTagName("order")[0].parentNode.parentNode !=null){
+  			alert("Order tag is not the parent tag");
+  			return;
+  		}
+  		var nodeList = (xmldoc.getElementsByTagName("order")[0].childNodes);
+  		var ar = new Array();
+  		nodeList.forEach(x=>{
+  			ar.push(x.nodeName);
+  		});
+  		indexOfId = ar.indexOf("id");
+  		console.log(xmldoc.getElementsByTagName("order")[0].childNodes[indexOfId].nodeName);
+  		 if(xmldoc.getElementsByTagName("order")[0].childNodes[indexOfId].nodeName !="id"){
+  			alert("Id should be immediate child of order node");
+  			return;
+  		} 
+  			
+  		let id=  xmldoc.getElementsByTagName("id")[0].childNodes[0].nodeValue;
+  		
+  		if(isNaN(parseInt(id))){
+  			alert("Id not a number");
+  			return;
+  		}
+  	  }catch(e){
+  		  alert("Please have Order tag as root and Id as its child");
+  		  return;
+  	  }
+  	 $.ajax({
+  		method:"POST",
+  		url:"http://localhost:7001/xml/insert",
+  		contentType: "text/xml",
+  	    dataType: "text",
+  		data:data,
+  	  	success: function(data){
+  	  		let item = document.querySelector("#xmlBodyContainer");
+         	 	item.innerHTML = data;
+         	 	refreshDropDown();
+  	  	},
+  	  	error:function(err){
+  	  		console.log("error occured while inserting");
+  	  	}
+  	  	
+  	  });
+    }
+	function clearScreen(){
+		let item = document.querySelector("#xmlBodyContainer");
+		item.innerText ="";
+	}
+	
+	function updateXmlById(){
+		
+	}
+	
+	function validatePin(e) {
+		
+		var keyValue = e.key;
+		if (keyValue.match(/[0-9]/g)) {
+			return true;
+		}
+		return false;
+	}
+	
+	
+	function ensureNumberic(e) {
+		let value = document.getElementById("phone").value;
+		if (value.length + 1 > 10) {
+			return false;
+		}
+		var keyValue = e.key;
+		if (keyValue.match(/[0-9]/g)) {
+			return true;
+		}
+		return false;
+	}
+    
+    </script>
+  </body>

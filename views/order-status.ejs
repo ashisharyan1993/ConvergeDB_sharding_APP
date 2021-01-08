@@ -1,0 +1,57 @@
+  <% include include/header.ejs %>
+  <% var bill=0 %>
+
+    
+  <div class="container">
+    <form method="POST" action="/update-cart">
+      <div style="text-align: center;padding:1em">
+        <h1>Order Details</h1>
+      </div>
+      <div style="margin-top:2em;"class="table-responsive">
+        <h3>Status : <%= status %></h3>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Product</th>
+              <th>Price</th>
+              <th>Quantity</th>
+              <th>Total Price</th>
+            </tr>
+          </thead>
+          <tbody>
+          <% products.forEach(function(product, index) { %>
+            <tr>
+              <td><a class="text-body" href="/product/<%= product.pid %>"><img style="max-width: 100px; max-height: 50px;" src="<%= product.picture %>" /></a></td>
+              <td><a class="text-body" href="/product/<%= product.pid %>"><%= product.title %></a><br><span class="badge badge-warning"><%= product.name %></span></td>
+              <td>$<%= product.price %></td>
+              <td><%= product.quantity %></td>
+              <td>$<%= product.price*product.quantity %></td>
+            </tr>
+          <% }); %>
+          </tbody>
+        </table>
+      </div>
+      <p style="display: none;"><% products.forEach(function(product, index) { %>
+        <%= bill+=product.price*product.quantity %>
+      <% }); %></p>
+      <div>
+        <h4 style="float: right;">Total Bill : $<%= bill %> </h4>
+      </div>
+      <div class="clearfix"></div>
+      
+      <div class="clearfix">  </div>
+    </form>
+    <h3>Customer Details :</h3>
+    <ul>
+        <li>Name : <%= userData.name %></li>
+        <li>Email : <%= userData.email %></li>
+        <li>Address : <%= userData.address %></li>
+        <li>City : <%= userData.city %></li>
+        <li>Contact Number : <%= userData.phone %></li>
+        <li>Pincode : <%= userData.pincode %></li>
+    </ul>
+    <div>
+        <a href="/shop"style="float: right;">Continue Shopping.. </a>
+      </div>
+  </div>

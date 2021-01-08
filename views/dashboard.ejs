@@ -1,0 +1,302 @@
+<link rel="stylesheet" type="text/css" media="screen" href="css/dashboard.css" />
+<% include include/header.ejs %>
+<body  >
+   <div style="text-align: center;padding:1em; border-bottom: 4px solid lightgray;background-image: url('analyticsheader.jpg');">
+     <h1 style="color:white;">eShop Business Analysis</h1></div>
+     <div class="row" style="width: 100%; ">
+        <div  class="row" style = "width: 70%; height: 400px;margin-left:14.5px;">
+            <div class="column" style = "width: 25%; height: 100px; border: 4px solid lightgray;background-color:white;">
+                <h3 class="Box" style="text-align: center;color:purple;margin-top: 10px;"><%= Total %></h3>
+                <p class="Box" style="text-align: center;color:purple;">Product Count</p></div>
+            <div class="column" style = "width: 25%; height: 100px; border: 4px solid lightgray; background-color:white;">
+                <h3 class="Box" style="text-align: center;color:purple;margin-top: 10px;">200</h3>
+                <p class="Box" style="text-align: center;color:purple;">Mens Dress</p></div>
+            <div class="column"  style = "width: 25%; height: 100px; border: 4px solid lightgray; background-color:white;">
+                <h3 class="Box" style="text-align: center;color:purple;margin-top: 10px;">100</h3>
+                <p class="Box" style="text-align: center;color:purple;">Female Dress</p></div>
+            <div class="column" style = "width: 25%; height: 100px;border: 4px solid lightgray; background-color:white;">
+                <h3 class="Box"style="text-align: center;color:purple;margin-top: 10px;">187</h3>
+                <p class="Box" style="text-align: center;color:purple;">Other Dress</p></div>
+            <div  class="row" style = "width: 100%; height: 300px; margin-left:0px;">
+                <div class="column" id = "container3" style = "width: 36%; height: 300px; border: 4px solid lightgray; "></div>
+                <div class="column" id = "containerline" style = "width: 64%; height: 300px; border: 4px solid lightgray;margin-left:0px "></div>
+                
+            </div>
+        </div>
+        <div>
+            
+        </div>
+            <div class="row" style = "width: 30%; height: 400px;background-color:white;margin-left:15px">
+                <div class="row" style = "width: 100%; height: 250px;border: 4px solid lightgray;background-color:white;margin-left: 0px;">
+                    <h5 class="header" style="text-align: center; width:100%; height: 10px; font: 'bold 16px Trebuchet MS, Verdana, sans-serif';">Sales By Division</h5>
+                    <div class="column" style="width:33.3%; height: 200px;">
+                      <img src="men.JPG" alt="Snow" style="width:90%; height: 150px;border: 2px solid black;margin-left: 5px;">
+                      <p class="Box" style="text-align: center;padding:1em;"><b>3754.08$ Mens</b></p>
+                    </div>
+                    <div class="column" style="width:33.3%; height: 200px;">
+                      <img src="women.jpg" alt="Forest" style="width:90%; height: 150px;border: 2px solid black;margin-left: 5px;">
+                      <p class="Box" style="text-align: center;padding:1em;"><b>15794.76$ Female</b></p>
+                    </div>
+                    <div class="column" style="width:33.3%;height: 200px;">
+                      <img src="other.png" alt="Mountains" style="width:90%; height: 150px;border: 2px solid black;margin-left: 5px;">
+                      <p class="Box" style="text-align: center;padding:1em;"><b>3081.12$ Others</b></p>
+                    </div>
+                </div>
+                <div class="row" style = "width: 100%; height: 150px;border: 4px solid lightgray;margin-left: 0px;">
+                    <img src="jeansoffer.jpg"></div>
+                 
+        </div>
+        <div  class="row" style ="width: 100%; height: 300px;margin-left: 15px">
+            <div class="column" id = "container2" style = "width: 25%; height: 300px; border: 4px solid lightgray;"></div>
+            <div class="column" id = "container" style = "width: 45%; height: 300px; border: 4px solid lightgray; "></div>
+            <div class="column" style = "width: 30%; height: 300px; border: 4px solid lightgray;background-color:white;">
+                <h5 class="header" style="text-align: center; color:black; ">Top 5 Product Orders</h5>
+                
+                    <table style="width:100%; height: 258px;">
+                    <tr>
+                        <th>Product Name</th>
+                        <th>No Of Orders</th> 
+                        <th>Total value</th>
+                    </tr>
+                    <% top5.forEach(function(top5) { %>
+                    <tr>
+                        <td><%= top5.product_name %></td>
+                        <td><%= top5.number_of_orders %></td>
+                        <td><%= top5.total_value %>$</td>
+                    </tr>
+                    <% }); %>
+                    </table>
+            </div>
+      </div>
+
+         <script>
+            Highcharts.chart('containerline', {
+
+                title : {
+                  text: 'Number of Shoppers : Male and Female during SALE',
+                  style: {
+                 color: '#000',
+                     font: 'bold 16px "Trebuchet MS", Verdana, sans-serif'
+                    }  
+               },
+
+                    yAxis: {
+                        title: {
+                            text: 'Sales Count'
+                        }
+                    },
+
+                    xAxis :{
+                  categories: <%- JSON.stringify(SALES_TYPE_NAME) %>,
+                  crosshair: false,
+                  title: {
+                    text: 'SALE DAY'}
+                 },
+                 credits : {
+                            enabled: false
+                                },
+
+                 legend : {
+                  layout: 'vertical',
+                  align: 'right',
+                  verticalAlign: 'middle',
+                  borderWidth: 0
+               },
+
+                   
+                    series: [{
+                                        name: 'Male',
+                                        data: <%- JSON.stringify(MCOUNTS) %>
+                                    }, 
+                                    {
+                                        name: 'Female',
+                                        data: <%- JSON.stringify(FCOUNTS) %>
+                                    }
+                                ],
+
+                    responsive: {
+                        rules: [{
+                            condition: {
+                                maxWidth: 500
+                            },
+                            
+                            chartOptions: {
+                                legend: {
+                                    layout: 'horizontal',
+                                    align: 'center',
+                                    verticalAlign: 'bottom'
+                                }
+                            }
+                        }]
+                    }
+
+                    });
+         </script>
+         <script>
+             Highcharts.chart('container3', {
+                            chart: {
+                                plotBackgroundColor: null,
+                                plotBorderWidth: null,
+                                plotShadow: false,
+                                type: 'pie'
+                            },
+                            title: {
+                                text: 'Category shares in Product count',
+                                style: {
+                                color: '#000',
+                                    font: 'bold 16px "Trebuchet MS", Verdana, sans-serif'
+                                  }    
+                            },
+                            tooltip: {
+                                    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                                },
+                           
+                            plotOptions:{
+                                pie: {
+                                    allowPointSelect: true,
+                                    cursor: 'pointer',
+                                    
+                                    dataLabels: {
+                                        enabled: true,
+                                        format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                                        style: {
+                                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor)||
+                                        'black'
+                                        }
+                                    }
+                                }
+                            },
+                            series: [{
+                                    type: 'pie',
+                                    showInLegend: true,
+                                    name: 'Category Share',
+                                    data: <%- JSON.stringify(piechart) %>
+                                }],
+                                credits: {
+                                enabled: false
+                                    }
+                        });
+         </script>
+         <script>
+            Highcharts.chart('container', {
+            chart: {
+                    type: 'area'
+                    },
+              title: {
+               text: 'Last 3Month Sale Revenue',
+               style: {
+                 color: '#000',
+                     font: 'bold 16px "Trebuchet MS", Verdana, sans-serif'
+                    }
+            },
+            subtitle: {
+               text: ''  
+            },
+            xAxis : {
+               categories: <%- JSON.stringify(SALE_DATE) %>,
+               title: {
+                  text: 'Date&Time'
+               }
+            },
+            yAxis: {
+               min: 0,
+               title: {
+                  text: 'Revenue(K$)',
+               },
+               labels: {
+                  overflow: 'justify'
+               }
+            },
+            tooltip: {
+               valueSuffix: 'K US $'
+            },
+            plotOptions: {
+               bar: {
+                  dataLabels: {
+                     enabled: false
+                  }
+               }
+            },
+            legend: {
+               layout: 'vertical',
+               align: 'right',
+               verticalAlign: 'bottom',
+               x: 0,
+               y: 100,
+               floating: true,
+               borderWidth: 1,
+               
+               backgroundColor: (
+                  (Highcharts.theme && Highcharts.theme.legendBackgroundColor) ||
+                     '#FFFFFF'),
+               shadow: true
+            },
+            credits: {
+               enabled: false
+            },
+            series: [
+               {
+                  name: 'Total sell($)',
+                  data: <%- JSON.stringify(VALUE_OF_ORDERS) %>
+               }
+            ]
+                });
+         </script>
+
+         <script>
+            Highcharts.chart('container2', {
+             chart: {
+                type: 'column'
+            },
+            title: {
+                text: 'Product Counts by Price',
+                style: {
+                 color: '#000',
+                     font: 'bold 16px "Trebuchet MS", Verdana, sans-serif'
+                    } 
+            },
+            subtitle: {
+                text: ''  
+            },
+            xAxis: {
+                categories: <%- JSON.stringify(price) %>,
+                crosshair: true,
+		    title: {
+                    text: 'Product Price($)'
+                }
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Product (Count)'         
+                }      
+            },
+            tooltip: {
+                headerFormat: '<span style = "font-size:10px">{point.key}</span><table>',
+                pointFormat: '<tr><td style = "color:{series.color};padding:0">{series.name}: </td>' +
+                    '<td style = "padding:0"><b>{point.y:.1f} </b></td></tr>',
+                footerFormat: '</table>',
+                shared: true,
+                useHTML: true
+            },
+            plotOptions: {
+                column: {
+                    pointPadding: 0.2,
+                    borderWidth: 0
+                }
+            },
+            credits: {
+                enabled: false
+            },
+            series: [
+                {
+                    name: 'Product count',
+                    data: <%- JSON.stringify(pricecount) %>
+                }
+            ]
+            });     
+        
+         </script>
+        
+      </body>     
+    

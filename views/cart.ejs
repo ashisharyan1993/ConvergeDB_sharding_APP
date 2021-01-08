@@ -1,0 +1,57 @@
+
+  <% include include/header.ejs %>
+  <% var bill=0 %>
+
+    
+  <div class="container">
+    <form method="POST" action="/update-cart">
+    <% if(products.length > 0) { %>
+      <div style="text-align: center;padding:2em">
+        <h1>Cart</h1>
+      </div>
+      <div style="margin-top:2em;"class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Product</th>
+              <th>Price</th>
+              <th>Quantity</th>
+              <th>Total Price</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+          <% products.forEach(function(product, index) { %>
+            <tr>
+              <td><a class="text-body" href="/product/<%= product.pid %>"><img style="max-width: 100px; max-height: 50px;" src="<%= product.picture %>" /></a></td>
+              <td><a class="text-body" href="/product/<%= product.pid %>"><%= product.title %></a><br><span class="badge badge-warning"><%= product.name %></span></td>
+              <td>$<%= product.price %></td>
+              <td><input type="number" style="width: 70px;" min="1" name="qnt[]" value="<%= product.quantity %>"/></td>
+              <td>$<%= product.price*product.quantity %></td>
+              <td><a href="/remove-from-cart/<%= product.pid %>">Delete</a></td>
+            </tr>
+          <% }); %>
+          </tbody>
+        </table>
+      </div>
+      <p style="display: none;"><% products.forEach(function(product, index) { %>
+        <%= bill+=product.price*product.quantity %>
+      <% }); %></p>
+      <div>
+        <h4 style="float: right;">Total Bill : $<%= bill %> </h4>
+      </div>
+      <div class="clearfix"></div>
+      <a href="/empty-cart" class="btn btn-danger float-left">Clear cart</a>
+      <a href="/checkout" class="btn btn-primary float-right">Checkout</a>
+      
+      
+      <button type="submit" class="btn btn-success float-right" style="margin-right: 10px;">Update</button>
+      <div class="clearfix">  </div>
+    <% } else { %>
+      <div style="display: flex;justify-content: center;align-content: center;padding:5%">
+        <h4>Your cart is empty. <a href="/shop">Continue shopping</a> </h4>
+      </div>
+    <% } %>
+    </form>
+  </div>

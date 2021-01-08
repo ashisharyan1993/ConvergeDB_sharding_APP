@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv='Content-Type' content='text/html; charset="utf-8"' />
+  <title><%= siteTitle+' | '+title %></title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://d19vzq90twjlae.cloudfront.net/leaflet-0.7/leaflet.css" />
+    <script type='text/javascript' src='http://maps.oracle.com/mapviewer/jslib/v2.2/oraclemapsv2.js'></script>
+    <link rel="stylesheet" type="text/css" media="screen" href="css/main.css"/>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <!-- Favicon -->
+  <link rel="shortcut icon" href="https://via.placeholder.com/16/007bff/007bff" type="image/x-icon">
+  
+  
+</head>
+<body onload="javascript:showMap()">
+ 
+    <% include include/header.ejs %>
+
+    <div style="display: flex;justify-content: center;align-content: center;padding:10px">
+      <form action="/map">
+        <label for="cars">Choose an area:</label>
+        <select id="area" name="area">
+        <!--Condition in the for loop to select the option based on the area passed in the request param-->
+        <% for(var i = 0; i <= options.length; i++) { %>
+          <% if( options[i] == selectedArea) { %>
+          <option value='<%= options[i] %>' selected="true"><%= options[i] %></option>
+          <% } else {%>
+            <option value='<%= options[i] %>'><%= options[i] %></option>
+          <% } %>
+        <% } %>
+        </select>
+        <input type="submit">
+      </form>
+    </div>
+    <div style="display: flex;justify-content: center;align-content: center;padding:10px">
+    <div id="map" style="width: 100%; height: 500px"></div>
+    </div>
+    <script src="https://d19vzq90twjlae.cloudfront.net/leaflet-0.7/leaflet.js"></script>
+    <!-- <script>
+    //    var getData = <%-JSON.stringify(data) %>;
+    //    console.log(getData)
+    //     var map = L.map('map').setView([getData[0].CENTER_LAT,getData[0].CENTER_LONG], 2);
+    //     mapLink = 
+    //         '<a href="http://openmaptiles.org">OpenMapTiles OpenStreetMap</a>';
+    //     L.tileLayer(
+    //         'http://elocation.oracle.com/mapviewer/mcserver/ELOCATION_MERCATOR/osm_bright/{z}/{y}/{x}.png', {
+              
+    //           reuseTiles : false,
+            
+    //         maxZoom: 100,
+    //         }).addTo(map);
+
+		//         for (var i = 0; i < getData.length; i++) {
+		// 	      marker = new L.marker([getData[i].CENTER_LAT,getData[i].CENTER_LONG])
+		// 	    	.bindPopup(`<p><strong>Store Name :</strong> ${getData[i].STORE_NAME}</p><p><strong>Store ID :</strong> ${getData[i].STORE_ID}</p><p><strong>Postal Code :</strong> ${getData[i].POSTAL_CODE}</p>`)
+		// 		    .addTo(map);
+		//         }        
+    // </script> -->
+    <script language="JavaScript" type="text/javascript">
+      var baseURL  = "http://maps.oracle.com/mapviewer";
+      
+      function showMap()
+      {      
+          var getData = <%-JSON.stringify(data) %>;
+          console.log(getData)
+          var mapCenterLon = getData[0].CENTER_LONG;
+          var mapCenterLat = getData[0].CENTER_LAT;
+          var mapZoom      =  3;  
+          var mpoint = new OM.geometry.Point(mapCenterLon,mapCenterLat,8307);
+          
+          var map = new OM.Map(
+          document.getElementById('map'),
+          {
+              mapviewerURL: baseURL
+          }) ;       
+          var tileLayer = new OM.layer.TileLayer( "baseMap", 
+          {
+              dataSource:"elocation_mercator", 
+              tileLayer:"world_map", 
+              tileServerURL:baseURL+"/mcserver"
+          });
+          
+          map.addLayer(tileLayer) ;
+
+          layer = new OM.layer.MarkerLayer("markerlayer4");
+
+          // set all properties after a map marker is added, srid is default (8307)
+        var insertMapMarker1 = function(id, cx, cy, text, label, draggable) {
+                var mm = new OM.MapMarker();
+                layer.addMapMarker(mm);   // add a map marker into marker layer
+                mm.setPosition(cx, cy);
+                mm.setMarkerText(text);  // it will also set the marker text. 
+                mm.setLabel(label);  // it will also set the marker text. 
+                mm.setID(id);
+               
+                var renderStyle = new OM.style.Marker({
+                      width: 50,
+                      height: 50,
+                      src: "pin.png",
+                      xOffset: 0,
+                      yOffset: 0
+                    });
+                var textStyle = new OM.style.Text({
+                    styleName:"txt",
+                    fill:"#00a000",
+                    fontStyle: OM.Text.FONTSTYLE_NORMAL,
+                    fontFamily:"Arial",
+                    fontSize:0
+                });
+                var labelStyle = new OM.style.Text({
+                    //styleName: '',
+                    fill: "#00a000",
+                    fontStyle: OM.style.Text.FONTSTYLE_ITALIC,
+                    fontSize: 0,
+                    sticky: false
+                });
+                mm.setRenderingStyle(renderStyle);                
+                mm.setMarkerTextStyle(textStyle);                
+                mm.setLabelingStyle(labelStyle);  
+        };
+        // an obj with all properties to instantiate a map marker
+        var insertMapMarker4 = function(id, cx, cy, srid, text, label) {
+                var myobj = {id: id,
+                             markerText: text,
+                             label: label,
+                             dragStart: dragStart,
+                             dragEnd: dragEnd,
+                             dragging: dragging,
+                             position: {'x': cx, 'y': cy,'srid': srid}};
+                var mm = new OM.MapMarker(myobj);
+                layer.addMapMarker(mm);   // add a map marker into marker layer
+        };
+        
+        for (var i = 0; i < getData.length; i++) {
+        insertMapMarker1(getData[i].STORE_ID, getData[i].CENTER_LONG, getData[i].CENTER_LAT, getData[i].POSTAL_CODE, getData[i].STORE_NAME, false);  // id, cx, cy, srid, label, draggable
+        //insertMapMarker4(getData[i].STORE_ID, getData[i].CENTER_LONG, getData[i].CENTER_LAT, 8307, 'M'); 
+      }
+        var defaultLabelSty = new OM.style.Text({
+            //styleName: 'defaultLabelSty', 
+            fill: "#ffffff",
+            fontStyle: OM.style.Text.FONTSTYLE_ITALIC,
+            fontSize: 12,
+            sticky: false
+        });
+        layer.setLabelingStyle(defaultLabelSty);  // you need set a map marker's labeling style from a map marer instance
+        map.addLayer(layer);
+        layer.setToolTipCustomizer(featureTip);
+        layer.setLabelsVisible(true);
+
+
+          navigationPanelBar=new OM.control.NavigationPanelBar();
+          map.addMapDecoration(navigationPanelBar);
+          map.setMapCenter(mpoint);
+          
+          map.setMapZoomLevel(mapZoom) ;
+          map.init() ;
+          
+        }    
+        function featureTip(f)
+        {
+        return "STORE ID: "+f.id+"\nSTORE NAME: "+f.label+
+                "\nPOST CODE: "+f.markerText;
+    }
+  </script>
+</body>
+</html>

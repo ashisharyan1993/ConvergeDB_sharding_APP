@@ -1,0 +1,46 @@
+  <% include include/header.ejs %>
+  <div style="text-align: center;padding:1em">
+    <h2>Enter Order Details</h2>
+  </div>
+  <div class="container">
+    <form action="/orderdetail" method="POST">
+      <div class="row">
+
+        <div class="col-md-6">
+          
+          <div class="form-group">
+            <label for="name">Full name:</label>
+            <input type="text" class="form-control" id="name" name="name">
+          </div>
+          <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" class="form-control" id="email" name="email">
+          </div>
+          <div class="form-group">
+            <label for="phone">Phone:</label>
+            <input type="text" class="form-control" id="phone" name="phone">
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="address">Address:</label>
+            <input type="text" class="form-control" id="address" name="address">
+          </div>
+          <div class="form-group">
+            <label for="city">City:</label>
+            <input type="text" class="form-control" id="city" name="city">
+          </div>
+          <div class="form-group">
+            <label for="phone">Pincode:</label>
+            <input type="text" class="form-control" id="pincode" name="pincode">
+          </div>
+       
+        </div>
+      
+      </div>
+      <div style="display: flex;justify-content: center;padding: 2em;">
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </div>
+    </form>
+    
+  </div>
